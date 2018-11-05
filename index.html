@@ -2,22 +2,29 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-    </style>
   </head>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font: 13px Helvetica, Arial; }
+    #messages { list-style-type: none; margin: 0; padding: 0; }
+    #messages li { padding: 5px 10px; }
+    #messages li:nth-child(odd) { background: #eee; }
+    .content { padding-bottom: 50px; scroll-behavior: [ auto | smooth ]; }
+    .panel-footer { position: fixed; bottom: 0; width: 100%;}
+  </style>
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+    <div class="content">
+      <ul id="messages"></ul>
+    </div>
+    <div class="panel-footer">
+      <div class="input-group">
+          <input id="editor" type="text" class="form-control input-sm chat_input" placeholder="Write your message here..." />
+          <span class="input-group-btn" id="send_message">
+          <button class="btn btn-primary btn-sm" >Send</button>
+          </span>
+      </div>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
@@ -25,12 +32,17 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      $(function () {
+      $('document').ready(function () {
         var socket = io();
-        $('form').submit(function(){
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
+        $('#send_message').click(function(){
+          socket.emit('chat message', $('#editor').val());
+          $('#editor').val('');
           return false;
+        });
+        $('#editor').keypress(function(e){
+          if(e.which == 13){
+            $('#send_message').click();
+          }
         });
         socket.on('chat message', function(msg){
           $('#messages').append($('<li>').text(msg));
